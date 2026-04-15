@@ -1,19 +1,12 @@
 package Entity.Effects;
 
-public class SmokebombEffect implements Effects {
+public class DefendEffect implements Effects {
     private int remainingDuration;
     private final int initialDuration = 2;
+    private final int defBoost = 10;
 
-    public SmokebombEffect() {
+    public DefendEffect() {
         remainingDuration = initialDuration;
-    }
-
-    public int getInitialDuration() {
-        return initialDuration;
-    }
-
-    public boolean hasExpired() {
-        return remainingDuration <= 0;
     }
 
     public void decrementDuration() {
@@ -24,7 +17,15 @@ public class SmokebombEffect implements Effects {
         return remainingDuration;
     }
 
+    public boolean hasExpired() {
+        return remainingDuration <= 0;
+    }
+
     public String getEffectName() {
-        return "SmokeBombInvulnerability";
+        return "DefendEffect";
+    }
+
+    public int getDefBoost() {
+        return defBoost;
     }
 }
