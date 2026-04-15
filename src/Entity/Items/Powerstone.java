@@ -7,9 +7,11 @@ import Entity.Combatant.Combatant;
 import java.util.List;
 
 public class Powerstone implements Item {
-    private static final String name = "Powerstone";
+    private static final String name = "PowerStone";
 
-    public String getName() { return this.name; }
+    public String getName() {
+        return this.name;
+    }
 
     public void activateItem(Combatant user, Combatant enemy, List<Combatant> enemies) {
         switch (user.getName()) {
