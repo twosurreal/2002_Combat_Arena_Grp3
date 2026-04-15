@@ -1,7 +1,15 @@
+// ActionChoiceController.java: Joshua
+// main menu for player turns
+// direct skill choice to right controllers
+// if action is cancelled, it return false so player can pick again without losing their turn
+
 package Control;
 
 import Boundary.GamePlayScreen;
-import Entity.Actions.*;
+import Boundary.InputHelper;
+import Entity.Actions.Action;
+import Entity.Actions.BasicAttack;
+import Entity.Actions.Defend;
 import Entity.Combatant.Combatant;
 import Entity.Items.Item;
 
@@ -9,57 +17,57 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ActionChoiceController {
-    private final ItemChoiceController itemChoiceController;
-    private final TargetChoiceController targetChoiceController;
-    private final SkillController skillController;
-    private final Scanner scanner;
 
+    private final ItemChoiceController itemChoiceController; //handle item selection and activaation
+    private final TargetChoiceController targetChoiceController; //target selection from live enemy list
+    private final SkillController skillController;  //scanner for everything
+    private final Scanner scanner;  //check skill if available
+
+    //create sub controllers and link the input scanner
     public ActionChoiceController() {
         itemChoiceController = new ItemChoiceController();
         targetChoiceController = new TargetChoiceController();
         skillController = new SkillController();
-        scanner = new Scanner(System.in);
+        scanner = InputHelper.getScanner();
     }
 
-    private Action convertActionChoice(int actionChoice, Combatant user, List<Combatant> enemies, GamePlayScreen gameplayUI) {
-        switch(actionChoice) {
+    // direct player's menu choice to the correct handle
+    // return true to end turn, false to show the menu again if cancelled
+    public boolean handleActionChoice(int actionChoice, Combatant user, List<Combatant> enemies, GamePlayScreen gameplayUI) {
+        switch (actionChoice) {
+            //basic attack
             case 1 -> {
-                return new BasicAttack();
+                Combatant target = targetChoiceController.handleTargetChoice(scanner, enemies);
+                if (target == null) return false; // cancelled
+                new BasicAttack().performAction(user, target, enemies, false);
+                return true;
             }
+            //defend
             case 2 -> {
-                return new Defend();
+                new Defend().performAction(user, null, enemies, false);
+                return true;
             }
+            //use item
             case 3 -> {
                 Item selectedItem = gameplayUI.displayItemChoice(user);
-                return new ItemAction(selectedItem, itemChoiceController);
+                if (selectedItem == null) return false; // cancelled
+                return itemChoiceController.handleItemChoice(selectedItem, user, enemies);
             }
+            //special skill
             case 4 -> {
-                if (user.getSpecialSkillCooldown() > 0) {
-                    System.out.println("\n!!! Skill in cooldown.");
-                    return null;
+                Action skill = skillController.getCombatantSkill(user);
+                if (skill == null) return false; // on cooldown
+
+                Combatant target = null;
+                if (skill.needsTarget()) {
+                    target = targetChoiceController.handleTargetChoice(scanner, enemies);
+                    if (target == null) return false; // cancelled
                 }
-
-                return skillController.getCombatantSkill(user);
+                //perform the skill
+                skill.performAction(user, target, enemies, false);
+                return true;
             }
-            default -> {
-                return null;
-            }
+            default -> { return false; }
         }
-    }
-
-    public boolean handleActionChoice(int actionChoice, Combatant user, List<Combatant> enemies, GamePlayScreen gameplayUI) {
-        Action selectedAction = convertActionChoice(actionChoice, user, enemies, gameplayUI);
-
-        if (selectedAction == null) return false;
-
-        Combatant selectedEnemy = null;
-        if (selectedAction.needsTarget()) {
-            selectedEnemy = targetChoiceController.handleTargetChoice(scanner, enemies);
-        }
-
-        selectedAction.performAction(user, selectedEnemy, enemies, false);
-
-        // return true indicate action executed successfully
-        return true;
     }
 }

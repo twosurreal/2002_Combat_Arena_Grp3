@@ -1,20 +1,24 @@
+// SkillController.java: Joshua
+// return null of the skill is not ready, allow player to pick different action
+
 package Control;
 
 import Entity.Actions.Action;
-import Entity.Actions.ArcaneBlast;
-import Entity.Actions.ShieldBash;
 import Entity.Combatant.Combatant;
-
-import java.util.List;
-import java.util.Scanner;
 
 public class SkillController {
 
+    //return the skill if ready or on cooldown
+    //null tell controller to reset the menu so turn not wasted
     public Action getCombatantSkill(Combatant user) {
-        return switch (user.getName()) {
-            case "Warrior" -> new ShieldBash();
-            case "Wizard" -> new ArcaneBlast();
-            default -> null;
-        };
+        if (user.getSpecialSkillCooldown() > 0) {
+            return null;
+        }
+        return user.getSpecialSkill();
+    }
+
+    //return true if skill ready
+    public boolean isSkillReady(Combatant user) {
+        return user.getSpecialSkillCooldown() == 0;
     }
 }
