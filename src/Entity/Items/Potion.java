@@ -1,3 +1,7 @@
+// Potion.java: Joseph
+// heals 100 HP but cannot go over max HP
+// print message is handled by ItemChoiceController not here
+
 package Entity.Items;
 
 import Entity.Combatant.Combatant;
@@ -5,13 +9,18 @@ import Entity.Combatant.Combatant;
 import java.util.List;
 
 public class Potion implements Item {
-    private static final int heal_amount = 100;
+
+    // how much HP the potion restores
+    private static final int healAmount = 100;
     private static final String name = "Potion";
 
-    public String getName() { return this.name; }
+    // return item name for inventory display and switch matching
+    public String getName() {
+        return name;
+    }
 
+    // heals player by fixed amount so that HP does not exceed max limit
     public void activateItem(Combatant user, Combatant enemy, List<Combatant> enemies) {
-        int newHp = Math.min(user.getHp() + heal_amount, user.getMaxHp());
-        user.setHp(newHp);
+        user.setHp(Math.min(user.getHp() + healAmount, user.getMaxHp()));
     }
 }
