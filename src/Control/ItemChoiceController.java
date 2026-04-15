@@ -1,7 +1,5 @@
 package Control;
 
-import Entity.Actions.ArcaneBlast;
-import Entity.Actions.ShieldBash;
 import Entity.Combatant.Combatant;
 import Entity.Items.Item;
 import Entity.Items.Potion;
@@ -21,31 +19,28 @@ public class ItemChoiceController {
     }
 
     public void handleItemChoice(Item selectedItem, Combatant user, List<Combatant> enemies) {
-
         switch (selectedItem.getName()) {
             case "Potion" -> {
-                Potion potion = new Potion();
-                potion.activateItem(user, null, enemies);
+                selectedItem.activateItem(user, null, enemies);
                 System.out.println("\nYou used Potion. New HP: " + user.getHp() + " / " + user.getMaxHp());
             }
-            case "Powerstone" -> {
-                Powerstone powerstone = new Powerstone();
+            case "PowerStone" -> {
                 switch (user.getName()) {
                     case "Wizard" -> {
-                        powerstone.activateItem(user, null, enemies);
+                        selectedItem.activateItem(user, null, enemies);
                     }
                     case "Warrior" -> {
                         Combatant selectedEnemy = tcc.handleTargetChoice(scanner, enemies);
-                        powerstone.activateItem(user, selectedEnemy, enemies);
+                        selectedItem.activateItem(user, selectedEnemy, enemies);
                     }
                     default -> {
                         return;
                     }
                 }
             }
-            case "Smokebomb" -> {
-                Smokebomb smokebomb = new Smokebomb();
-                smokebomb.activateItem(user, null, enemies);
+            case "SmokeBomb" -> {
+                selectedItem.activateItem(user, null, enemies);
+                System.out.println("\nYou used Smoke Bomb. Enemy attacks deal 0 damage this turn and next.");
             }
             default -> {
                 return;

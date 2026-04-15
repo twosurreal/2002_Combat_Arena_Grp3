@@ -38,6 +38,7 @@ public class ActionChoiceController {
                     System.out.println("\n!!! Skill in cooldown.");
                     return null;
                 }
+
                 return skillController.getCombatantSkill(user);
             }
             default -> {

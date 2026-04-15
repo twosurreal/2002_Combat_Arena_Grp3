@@ -15,7 +15,15 @@ public class TargetChoiceController {
                 System.out.println(i + ". " + curEnemy.getName());
                 i++;
             }
-            int enemyChoice = scanner.nextInt();
+
+            int enemyChoice;
+            try {
+                enemyChoice = scanner.nextInt();
+            } catch (Exception e) {
+                scanner.nextLine();
+                System.out.println("\n!!! Invalid input. Enter a number.");
+                continue;
+            }
 
             if (enemyChoice > enemies.size() || enemyChoice < 1) {
                 System.out.println("\n!!! Invalid choice.");

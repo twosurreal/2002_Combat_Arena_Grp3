@@ -10,6 +10,10 @@ import Entity.Items.Powerstone;
 import Entity.Items.Smokebomb;
 import Entity.Level;
 
+import Entity.EnemyActions.EnemyBasicAttack;
+import Entity.TurnOrder.SpeedBasedTurnOrder;
+import Boundary.GamePlayScreen;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,14 +24,9 @@ public class SetupGame {
         gameStartScreen = new GameStartScreen();
     }
 
-    void main(String[] args){
-        initialiseGame();
-    }
-
     public void initialiseGame() {
-        System.out.println("\n=== Turn Based Combat Arena ===");
+        gameStartScreen.displayLoadingScreen();
 
-        // select character, items and level
         int combatantChoice = gameStartScreen.displayCharacterScreen();
         List<Integer> itemChoices = gameStartScreen.displayItemScreen();
         int levelChoice = gameStartScreen.displayLevelScreen();
@@ -36,8 +35,6 @@ public class SetupGame {
     }
 
     private void runGame(int combatantChoice, List<Integer> itemChoices, int levelChoice) {
-
-        // create objects from integer choices
         Combatant myCombatant = getCombatantFromChoice(combatantChoice);
 
         List<Item> myItems = new ArrayList<>();
@@ -47,39 +44,52 @@ public class SetupGame {
 
         Level myLevel = new Level(levelChoice);
 
-        // start gameplay
         BattleEngine gamePlayBackend = new BattleEngine(
                 myCombatant,
                 myItems,
-                myLevel
+                myLevel,
+                new EnemyBasicAttack(),
+                new SpeedBasedTurnOrder(),
+                new ActionChoiceController(),
+                new GamePlayScreen()
         );
 
-        System.out.println("\nStarting game");
-        gamePlayBackend.playGameLoop();
+        System.out.println("\nStarting game...");
+        boolean playerWon = gamePlayBackend.playGameLoop();
 
-        // handle game over once loop ends
-        gameOver(combatantChoice, itemChoices, levelChoice);
+        if (playerWon) {
+            gameVictory(combatantChoice, itemChoices, levelChoice);
+        } else {
+            gameDefeat(combatantChoice, itemChoices, levelChoice);
+        }
     }
 
-    private void gameOver(int combatantChoice, List<Integer> itemChoices, int levelChoice) {
+    private void gameVictory(int combatantChoice, List<Integer> itemChoices, int levelChoice) {
+        // Victory screen already displayed by BattleEngine via GamePlayScreen
         int replayChoice = gameStartScreen.displayReplayScreen();
+        handleReplay(replayChoice, combatantChoice, itemChoices, levelChoice);
+    }
 
+    private void gameDefeat(int combatantChoice, List<Integer> itemChoices, int levelChoice) {
+        int replayChoice = gameStartScreen.displayReplayScreen();
+        handleReplay(replayChoice, combatantChoice, itemChoices, levelChoice);
+    }
+
+    private void handleReplay(int replayChoice, int combatantChoice, List<Integer> itemChoices, int levelChoice) {
         switch (replayChoice) {
             case 1 -> {
-                System.out.println("!!! Replaying game with same settings");
+                System.out.println("Replaying with same settings...");
                 runGame(combatantChoice, itemChoices, levelChoice);
             }
             case 2 -> {
-                System.out.println("!!! Starting new game");
+                System.out.println("Starting new game...");
                 initialiseGame();
             }
             case 3 -> {
-                System.out.println("!!! Exiting game");
+                System.out.println("Thanks for playing!");
                 System.exit(0);
             }
-            default -> {
-                System.exit(0);
-            }
+            default -> System.exit(0);
         }
     }
 
