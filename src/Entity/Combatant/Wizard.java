@@ -11,4 +11,6 @@ public class Wizard extends Combatant {
     public Wizard() {
         super(hp, atk, def, spd, name, skillName);
     }
+
+    public boolean isUser() { return true; }
 }

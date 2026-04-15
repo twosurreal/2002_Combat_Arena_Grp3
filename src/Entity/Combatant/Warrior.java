@@ -11,4 +11,6 @@ public class Warrior extends Combatant {
     public Warrior() {
         super(hp, atk, def, spd, name, skillName);
     }
+
+    public boolean isUser() { return true; }
 }

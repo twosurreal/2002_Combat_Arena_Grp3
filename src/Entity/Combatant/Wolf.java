@@ -10,4 +10,6 @@ public class Wolf extends Combatant {
     public Wolf() {
         super(hp, atk, def, spd, name, "");
     }
+
+    public boolean isUser() { return false; }
 }

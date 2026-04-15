@@ -10,4 +10,6 @@ public class Goblin extends Combatant {
     public Goblin() {
         super(hp, atk, def, spd, name, "");
     }
+
+    public boolean isUser() { return false; }
 }

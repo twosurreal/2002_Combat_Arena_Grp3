@@ -7,19 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Combatant {
+public abstract class Combatant {
     private int hp;
     private int maxHp;
     private int atk;
     private int def;
     private int spd;
     private String name;
-    private int defDuration = 0;
     private int specialSkillCooldown = 0;
     public static final int max_items = 2;
     private List<Item> inventory = new ArrayList<>();
     private String specialSkillName;
     private List<Effects> statusEffects = new ArrayList<>();
+    private boolean justUsedSpecialSkill = false;
 
     public Combatant(int hp, int atk, int def, int spd, String name, String specialSkillName) {
         this.hp = hp;
@@ -36,15 +36,12 @@ public class Combatant {
     public int getHp() { return this.hp; }
 
     public void setHp(int newHp) {
-        // hp cant go below 0 or above max
         this.hp = Math.min(Math.max(newHp, 0), maxHp);
     }
 
     public void setDef(int newDef) { this.def = newDef; }
-    public void setDefDuration(int newDuration) { this.defDuration = newDuration; }
     public void setName(String newName) { this.name = newName; }
     public int getSpeed() { return this.spd; }
-    public int getDefDuration() { return this.defDuration; }
     public void setAtk(int newAtk) { this.atk = newAtk; }
     public void setSpecialSkillCooldown(int newDuration) { this.specialSkillCooldown = newDuration; }
     public int getSpecialSkillCooldown() { return this.specialSkillCooldown; }
@@ -54,16 +51,14 @@ public class Combatant {
     public int getSpd() { return this.spd; }
     public String getName() { return this.name; }
 
-    // checks if this combatant is the player using name match
-    public boolean isUser() {
-        return Objects.equals(name, "Wizard") || Objects.equals(name, "Warrior");
-    }
+    // each subclass overrides this now instead of using name string check
+    public abstract boolean isUser();
 
     public List<Item> getInventory() { return this.inventory; }
 
     public boolean isSmokebombed() {
         for (Effects e : statusEffects) {
-            if (Objects.equals(e.getEffectName(), "SmokebombEffect") && e.getDuration() > 0) {
+            if (Objects.equals(e.getEffectName(), "SmokeBombInvulnerability") && e.getDuration() > 0) {
                 return true;
             }
         }
@@ -74,11 +69,6 @@ public class Combatant {
 
     public void decrementSkillCooldown() {
         if (specialSkillCooldown > 0) specialSkillCooldown--;
-    }
-
-    public void decrementEffectDuration() {
-        statusEffects.forEach(Effects::decrementDuration);
-        statusEffects.removeIf(Effects::hasExpired);
     }
 
     public List<Effects> getStatusEffects() { return this.statusEffects; }
@@ -92,4 +82,7 @@ public class Combatant {
         }
         return false;
     }
+
+    public void setSkillJustUsed(boolean value) { this.justUsedSpecialSkill = value; }
+    public boolean skillJustUsed() { return justUsedSpecialSkill; }
 }
